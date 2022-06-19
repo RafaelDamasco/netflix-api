@@ -2,6 +2,10 @@ import { Repository } from "typeorm"
 import { AppDataSource } from "../../configs/database/data-source"
 import Movie from "../entities/movie.entity"
 
+interface CreateMovieDTO {
+    title: string
+}
+
 class MovieService {
    private movieRepository: Repository<Movie>
 
@@ -11,6 +15,10 @@ class MovieService {
 
   list() {
     this.movieRepository.find()
+  }
+
+  create(movie: CreateMovieDTO) {
+    return this.movieRepository.save(movie)
   }
 }
 
