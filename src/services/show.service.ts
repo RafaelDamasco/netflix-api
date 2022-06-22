@@ -15,7 +15,7 @@ class ShowService {
   }
 
   list() {
-    return this.showRepository.find()
+    return this.showRepository.find({ relations: ['episodes'] })
   }
 
   async listOne(id: number) {
