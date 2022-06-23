@@ -1,13 +1,13 @@
-import bcrypt from 'bcrypt'
-import { Repository } from 'typeorm'
-import { AppDataSource } from '../infrastructure/database/data-source'
-import User from '../entities/user.entity'
-import BadRequestException from '../exceptions/bad-request.exception'
+import bcrypt from "bcrypt"
+import { Repository } from "typeorm";
+import { AppDataSource } from "../infrastructure/database/data-source";
+import User from "../entities/user.entity";
+import BadRequestException from "../exceptions/bad-request.exception";
 
 interface CreateUserDTO {
-  email: string,
+  email: string;
 
-  password: string
+  password: string;
 }
 
 class UserService {
@@ -25,24 +25,34 @@ class UserService {
 
   async getUserByEmail(email: string) {
     const userFound = await this.userRepository.findOne({ where: { email } })
-    return userFound
+
+    return userFound;
   }
 
-  async create(createUserDTO: CreateUserDTO) {
-    const { email, password } = createUserDTO
-    const isEmailInDatabase = await this.isEmailInDatabase(email)
-    if (isEmailInDatabase) {
-      throw new BadRequestException('Usuário já cadastrado na base de dados')
-    }
-    const SALTS = 10
+  /**
+   * Realiza autenticação do usuário
+   *
+   * @param createUserDTO Dados do usuário
+   * @returns LoginResponse
+   *
+   */
+    async create(createUserDTO: CreateUserDTO) {
+      const { email, password } = createUserDTO;
+      const isEmailInDatabase = await this.isEmailInDatabase(email)
 
-    const newUserPayload = {
-      email,
-      password: await bcrypt.hash(password, SALTS)
+      if (isEmailInDatabase) {
+        throw new BadRequestException("Usuário já cadastrado na base de dados")
+      }
+
+      const SALTS = 10
+
+      const newUserPayload = {
+        email,
+        password: await bcrypt.hash(password, SALTS)
+      }
+
+      return this.userRepository.save(newUserPayload);
     }
-    console.log(createUserDTO)
-    return this.userRepository.save(newUserPayload)
-  }
 }
 
 export default UserService
